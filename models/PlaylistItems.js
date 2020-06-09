@@ -1,32 +1,16 @@
-const Sequelize = require('sequelize')
-const Model = Sequelize.Model
-const Playlist = require('Playlist')
-
 module.exports = (sequelize, DataTypes) => {
-  class PlaylistItem extends sequelize.Model { }
-  PlaylistItem.init({
-    playlistItemId: DataTypes.STRING,
-    videoId: DataTypes.STRING,
-    title: DataTypes.STRING,
-    channelId: DataTypes.STRING,
-    description: DataTypes.STRING,
-    thumbnailURL: DataTypes.STRING,
-    playlistId: {
-      type: DataTypes.STRING,
-      references: {
-        model: Playlist,
-        key: 'id'
-      }
-    },
-    videoPublishedAt: Sequelize.DATE,
-    position: Sequelize.INTEGER
+  const PlaylistItems = sequelize.define('PlaylistItems', {
+    id: { type: DataTypes.STRING, primaryKey: true },
+    etag: DataTypes.STRING,
+    position: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'playlistItem',
-    paranoid: true
-});
-  return PlaylistItem;
+    modelName: 'PlaylistItems'
+  })
+
+  return PlaylistItems;
 }
+
 
 // {
 //   "kind": "youtube#playlistItem",

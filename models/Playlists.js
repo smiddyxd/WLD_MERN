@@ -1,17 +1,18 @@
-
 module.exports = (sequelize, DataTypes) => {
-  const Playlist = sequelize.define('playlist', {
+  const Playlists = sequelize.define('Playlists', {
     id: { type: DataTypes.STRING, primaryKey: true },
     etag: DataTypes.STRING,
+    title: DataTypes.STRING,
     channelId: DataTypes.STRING,
-    title: DataTypes.STRING
+    publishedAt: DataTypes.DATE,
+    description: DataTypes.STRING,
+    registered: { type: DataTypes.BOOLEAN, defaultValue: false }
   }, {
     sequelize,
-    modelName: 'playlist',
-    paranoid: true
+    modelName: 'Playlists'
   })
 
-  return Playlist;
+  return Playlists;
 }
 
 /* {

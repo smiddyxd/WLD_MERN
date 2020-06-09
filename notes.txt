@@ -1,0 +1,127 @@
+implement video fetch generator
+
+instead of having snippet as a checlbox on source form, automatically update source whenever allowed
+implement searchSource for playlist
+  flow:
+    enter id into search field
+    click load
+    load playlistItems and data
+    replace save button with register button when source is search
+    put register button on topbar that is only clickable for unregistered playlists
+
+add contentDetailsLoaded functionality in
+playlist model
+sources
+
+bulk register my own playlists and channels I subscribed to
+
+split sources list into registered and cached
+
+
+sourceSearch settings functionality
+
+implement source change and save functionality
+
+implement videoSnapshots
+
+when sourceSearching:
+set the contentSource to the search
+while (itemsLoaded < minLoadItems)
+  await fetch an item and the corresponding video
+  on the frontend: transform it into DB data format
+  add it to cache
+  make db request to put it into db, dont await the response to this request, instead to then()
+  in then(): add missing data to frontend cache
+load playlist data
+add playlist data to cache
+load the rest of the items the same way as the first batch
+
+const [minLoadedItemsBeforePlaylistData, setMinLoadedItemsBeforePlaylistData] = useState(1)
+
+useEffect(() => {
+  switch (view) {
+    case 'details1':
+      setMinLoadedItemsBeforePlaylistData(50)
+      break
+    case 'details2':
+      setMinLoadedItemsBeforePlaylistData(12)
+      break
+    case 'bigPictures':
+      setMinLoadedItemsBeforePlaylistData(24)
+  }
+}, [view])
+
+const loadSearchedSource = async () => {
+  let playlistId = sourceSearch
+  let cachedSource = cache[sourceType][playlistId]
+  if (cachedSource) {
+    setSource(playlistId)
+    setContentSource(playlistId)
+  } else if (tokenStatus === 'fresh') {
+    setLoading(true)
+    let videoParts = 'snippet' + (sourceLoadStatistics ? ', statistics' : '') + (sourceLoadLength ? ', contentDetails' : '')
+    
+    for (let i = 0; i < minLoadedItemsBeforePlaylistData;i+50) { // change to i+50 ?
+      let first50PlaylistItems = getPlaylistItems()
+      let first50VideoIds = first50PlaylistItems.map(item => item.contentDetails.videoId)
+      let first50Videos = getVideoData(first50VideoIds)
+      let first50VideosFormatted = first50Videos.map(video => {
+        return {
+          // formatted video
+        }
+      })
+      let firstPlaylistItemsFormatted = firstPlaylistItems.map(playlistItem => {
+        return {
+          // formatted playlistItem
+        }
+      })
+      // implement videoSnapshots here
+      
+      let newCache = cache
+      newCache.playlistItems[playlistId] = []
+      setCache()
+      // await fetch an item and the corresponding videog
+      // create snapshots if videos are already saved
+      // on the frontend: transform it into DB data format
+      // add it to cache
+      // make db request to put it into db, dont await the response to this request, instead to then()
+      //   in then(): add missing data to frontend cache
+    }
+
+    let 
+    let playlistDataAndItems = await getPlaylistDataAndItems(sourceSearch, apiKey, accessToken, videoParts)
+    // if error setLoading(false)
+    console.log(playlistDataAndItems)
+    cachePlaylistInDB(playlistDataAndItems).then(res => {
+      if (res.data.success === true) {
+        console.log({ dbRes: res })
+        cachePlaylistOnFrontend(res.data)
+        setContentSourceType('playlists')
+        setContentSource(res.data.playlist.id)
+      }
+    })
+    setLoading(false)
+  }
+  // fetch PlaylistData And Items
+  // cache data and items in DB
+  // if DB cache is successful, cache on frontend in json file
+}
+
+
+  const fetchPlaylistFromYoutube = async (id, videoParts) => {
+    if (tokenStatus === 'fresh') {
+      setLoading(true)
+      let playlistDataAndItems = await getPlaylistDataAndItems(id, apiKey, accessToken, videoParts)
+      // if error setLoading(false)
+      console.log(playlistDataAndItems)
+      cachePlaylistInDB(playlistDataAndItems).then(res => {
+        if (res.success === true) {
+          console.log(res)
+          cachePlaylistOnFrontend(playlistDataAndItems)
+        }
+      })
+      setContent(playlistDataAndItems.items)
+      setLoading(false)
+
+    }
+  }
